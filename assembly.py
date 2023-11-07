@@ -30,9 +30,9 @@ firebase_admin.initialize_app(cred, {
 
 
 # functies uit te voeren wanneer deurbel is gedrukt
-def deurbel_pressed_callback(channel):
+def deurbel_pressed_callback():
     print("deurbel gedrukt!")
-    picam2.capture_file("test.jpg")
+    picam2.capture_file("foto.jpg")
     # Define a unique filename for your uploaded photo
     now = datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
     filename = "foto_" + now + ".jpg"
@@ -69,8 +69,8 @@ def button_monitor():
         time.sleep(0.1)  # Optional debounce delay
 
 def on_data_change(event):
-	db.reference('/readtest').set(f"succesvol change ({event.data}) gelezen op: " + datetime.now().strftime("%d-%m-%Y, %H:%M:%S"))
-
+    db.reference('/readtest').set(f"succesvol change ({event.data}) gelezen op: " + datetime.now().strftime("%d-%m-%Y, %H:%M:%S"))
+    deurbel_pressed_callback()
 
 def readtest_monitor():
     db.reference('/Locked').listen(on_data_change)

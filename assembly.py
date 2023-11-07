@@ -6,10 +6,12 @@ from firebase_admin import db
 import signal
 import sys
 import RPi.GPIO as GPIO
-
+import threading
 from picamera2 import Picamera2, Preview
 import time
 
+
+#camera settings
 picam2 = Picamera2()
 camera_config = picam2.create_preview_configuration()
 picam2.configure(camera_config)
@@ -27,8 +29,7 @@ firebase_admin.initialize_app(cred, {
 })
 
 
-BUTTON_GPIO = 16
-
+# functies uit te voeren wanneer deurbel is gedrukt
 def deurbel_pressed_callback(channel):
     print("deurbel gedrukt!")
     picam2.capture_file("test.jpg")
@@ -41,8 +42,56 @@ def deurbel_pressed_callback(channel):
     blob = bucket.blob(filename)
     blob.upload_from_filename('foto.jpg')
 
-if __name__ == '__main__':
-    GPIO.setmode(GPIO.BCM)
-    GPIO.setup(BUTTON_GPIO, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    GPIO.add_event_detect(BUTTON_GPIO, GPIO.FALLING,
-                          callback=deurbel_pressed_callback, bouncetime=100)
+    # Laat de database weten dat er net aangebeld werd
+    db.reference('/readtest').set("Er werd het laatst aangebeld op" + datetime.now().strftime("%d-%m-%Y, %H:%M:%S"))
+
+# Set the GPIO mode and pin number
+GPIO.setmode(GPIO.BCM)
+BUTTON_GPIO = 17  # You can use a different GPIO pin
+
+# Setup the button pin as an input with a pull-up resistor
+GPIO.setup(BUTTON_GPIO, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+
+# Initialize a variable to keep track of the button state
+previous_state = GPIO.input(BUTTON_GPIO)
+
+# Function to monitor the button state
+def button_monitor():
+    global previous_state
+    while True:
+        current_state = GPIO.input(BUTTON_GPIO)
+
+        if current_state != previous_state:
+            if current_state == GPIO.LOW:
+                deurbel_pressed_callback()
+
+
+        time.sleep(0.1)  # Optional debounce delay
+
+def on_data_change(event):
+	db.reference('/readtest').set(f"succesvol change ({event.data}) gelezen op: " + datetime.now().strftime("%d-%m-%Y, %H:%M:%S"))
+
+
+def readtest_monitor():
+    db.reference('/Locked').listen(on_data_change)
+
+# Create a thread for button monitoring
+button_thread = threading.Thread(target=button_monitor)
+button_thread.daemon = True  # Allow the thread to exit when the main program ends
+
+readtest_thread = threading.Thread(target=readtest_monitor)
+readtest_thread.daemon = True  # Allow the thread to exit when the main program ends
+
+
+try:
+    # Start the button monitoring thread
+    button_thread.start()
+    readtest_thread.start()
+    # Your main program logic here
+    while True:
+        # Do something else in your program
+        print(1)
+        time.sleep(2)
+
+except KeyboardInterrupt:
+    GPIO.cleanup()

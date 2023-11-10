@@ -220,7 +220,7 @@ try:
 
     print("Press buttons on your keypad. Ctrl+C to exit.")
     while True:
-        time.sleep(1)
+        time.sleep(0.1)
 except KeyboardInterrupt:
     print("Goodbye")
 finally:

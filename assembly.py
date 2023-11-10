@@ -48,9 +48,11 @@ def deurbel_pressed_callback():
 # Set the GPIO mode and pin number
 GPIO.setmode(GPIO.BCM)
 BUTTON_GPIO = 17  # You can use a different GPIO pin
+LOCK_GPIO = 14 
 
 # Setup the button pin as an input with a pull-up resistor
 GPIO.setup(BUTTON_GPIO, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(LOCK_GPIO, GPIO.OUT)
 
 # Initialize a variable to keep track of the button state
 previous_state = GPIO.input(BUTTON_GPIO)
@@ -67,26 +69,39 @@ def button_monitor():
 
 
         time.sleep(0.1)  # Optional debounce delay
+        
+def slot(state):
+    print("slot functie gaat runnen met state: ", state)
+    if state:
+        print("slot gaat open")
+        GPIO.output(LOCK_GPIO, GPIO.HIGH)
+        time.sleep(5)
+        print("slot gaat toe")
+        GPIO.output(LOCK_GPIO, GPIO.LOW)
+    elif not state:
+        print(f"slot gaat toe: {state} (elif satement) ")
+        GPIO.output(LOCK_GPIO, GPIO.LOW)
+    
 
-def on_data_change(event):
+def on_data_change_lock(event):
     db.reference('/readtest').set(f"succesvol change ({event.data}) gelezen op: " + datetime.now().strftime("%d-%m-%Y, %H:%M:%S"))
-    deurbel_pressed_callback()
+    slot(event.data)
 
 def readtest_monitor():
-    db.reference('/Locked').listen(on_data_change)
+    db.reference('/Locked').listen(on_data_change_lock)
 
 # Create a thread for button monitoring
 button_thread = threading.Thread(target=button_monitor)
 button_thread.daemon = True  # Allow the thread to exit when the main program ends
 
-readtest_thread = threading.Thread(target=readtest_monitor)
-readtest_thread.daemon = True  # Allow the thread to exit when the main program ends
+readlock_thread = threading.Thread(target=readtest_monitor)
+readlock_thread.daemon = True  # Allow the thread to exit when the main program ends
 
 
 try:
     # Start the button monitoring thread
     button_thread.start()
-    readtest_thread.start()
+    readlock_thread.start()
     # Your main program logic here
     while True:
         # Do something else in your program

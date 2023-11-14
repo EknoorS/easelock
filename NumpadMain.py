@@ -255,7 +255,7 @@ def check_key(key):
     else:
         entered += key
 
-
+"""
 try:
     factory = KeypadFactory()
     keypad = factory.create_keypad(keypad=KEYPAD,row_pins=ROW_PINS, col_pins=COL_PINS) # makes assumptions about keypad layout and GPIO pin numbers
@@ -268,3 +268,4 @@ except KeyboardInterrupt:
 	pass
 finally:
     keypad.cleanup()
+"""

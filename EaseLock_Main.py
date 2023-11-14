@@ -137,7 +137,7 @@ def CheckTimeslot(user):
 
 
 		
-		
+"""		
 while True:
 	try:
 		id, currentID = reader.read()
@@ -156,4 +156,4 @@ while True:
 			AddEntry(GetUsername(user) if user is not None else 'Unauthorized')
 			sleep(3)
 	except:
-		pass
+		pass"""

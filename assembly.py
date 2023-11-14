@@ -9,6 +9,9 @@ import RPi.GPIO as GPIO
 import threading
 from picamera2 import Picamera2, Preview
 import time
+import EaseLock_Main as em
+import NumpadMain as nm
+
 
 
 #camera settings
@@ -57,7 +60,7 @@ GPIO.setup(LOCK_GPIO, GPIO.OUT)
 # Initialize a variable to keep track of the button state
 previous_state = GPIO.input(BUTTON_GPIO)
 
-# Function to monitor the button state
+# Deurbel drukknop monitor
 def button_monitor():
     global previous_state
     while True:
@@ -69,7 +72,8 @@ def button_monitor():
 
 
         time.sleep(0.1)  # Optional debounce delay
-        
+
+# slot openen (max 5 seconden) of slot sluiten
 def slot(state):
     print("slot functie gaat runnen met state: ", state)
     if state:
@@ -81,32 +85,76 @@ def slot(state):
     elif not state:
         print(f"slot gaat toe: {state} (elif satement) ")
         GPIO.output(LOCK_GPIO, GPIO.LOW)
-    
 
+# Functie die opgeroepen word als de deur ontgrendeld moet worden
 def on_data_change_lock(event):
+    # laat weten dat we de change in slot status hebben geregistreerd
     db.reference('/readtest').set(f"succesvol change ({event.data}) gelezen op: " + datetime.now().strftime("%d-%m-%Y, %H:%M:%S"))
+    # open slot
     slot(event.data)
 
-def readtest_monitor():
+# THREAD FUNCTION die kijkt of de deur al dan niet geunlocked moet worden
+def readlock_monitor():
     db.reference('/Locked').listen(on_data_change_lock)
+
+def cardreader_monitor():
+    while True:
+        try:
+            id, currentID = em.reader.read()
+            if id is not None:
+                user = em.GetUserByID(id, currentID)
+                tags = em.GetTags()
+                allCurrentTagIDs = em.GetAllCurrentTagIDs(tags)
+                allTagIDs = em.GetAllTagIDs(tags)
+                if currentID.strip() in allCurrentTagIDs and str(id).strip() in allTagIDs:
+                    newID = str(em.uuid.uuid4())
+                    em.reader.write(newID)
+                    em.CheckTimeslot(em.GetUserByID(id, currentID))
+                    em.SetCurrentID(user, newID)
+                else:
+                    em.AddNewKey(id, currentID)
+                em.AddEntry(em.GetUsername(user) if user is not None else 'Unauthorized')
+                em.sleep(3)
+        except:
+            pass
+
+def numpad_reader_monitor():
+    try:
+        factory = nm.KeypadFactory()
+        keypad = factory.create_keypad(keypad=nm.KEYPAD, row_pins=nm.ROW_PINS,
+                                       col_pins=nm.COL_PINS)  # makes assumptions about keypad layout and GPIO pin numbers
+        keypad.registerKeyPressHandler(nm.check_key)
+
+        while True:
+            time.sleep(0.1)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        keypad.cleanup()
+
 
 # Create a thread for button monitoring
 button_thread = threading.Thread(target=button_monitor)
 button_thread.daemon = True  # Allow the thread to exit when the main program ends
 
-readlock_thread = threading.Thread(target=readtest_monitor)
+readlock_thread = threading.Thread(target=readlock_monitor)
 readlock_thread.daemon = True  # Allow the thread to exit when the main program ends
 
+cardreader_thread = threading.Thread(target=cardreader_monitor)
+cardreader_thread.daemon = True
+
+numpad_reader_thread = threading.Thread(target=numpad_reader_monitor)
+readlock_thread.daemon = True
 
 try:
     # Start the button monitoring thread
     button_thread.start()
+    # Start de lock change thread
     readlock_thread.start()
     # Your main program logic here
     while True:
         # Do something else in your program
-        print(1)
-        time.sleep(2)
+        pass
 
 except KeyboardInterrupt:
     GPIO.cleanup()

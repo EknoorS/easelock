@@ -1,4 +1,7 @@
+import assembly
 def OpenDoor():
-	print("open")
+	print("OpenDoor")
+	assembly.slot(True)
+
 	
 

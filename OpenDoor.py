@@ -1,0 +1,4 @@
+def OpenDoor():
+	print("open")
+	
+

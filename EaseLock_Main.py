@@ -1,4 +1,3 @@
-import EaseLock_Classes
 import firebase_admin
 from firebase_admin import credentials, db
 import RPi.GPIO as GPIO
@@ -6,6 +5,7 @@ from mfrc522 import SimpleMFRC522
 from datetime import date, datetime
 from time import sleep
 import uuid
+from OpenDoor import OpenDoor
 
 # ----------
 cred = credentials.Certificate("/home/admin/Guardian-Gate/rasp-test-8e035-firebase-adminsdk-ra7h9-924cbad2e3.json")
@@ -48,14 +48,14 @@ def GetTags():
 def GetAllTagIDs(allTags):
 	allIDs = []
 	for tag in allTags:
-		allIDs.append(tag['TagID'])
+		allIDs.append(str(tag['TagID']).strip())
 	return allIDs
 	
 
 def GetAllCurrentTagIDs(allTags):
 	allIDs = []
 	for tag in allTags:
-		allIDs.append(tag['CurrentTagID'])
+		allIDs.append(str(tag['CurrentTagID']).strip())
 	return allIDs
 # ----------
 
@@ -88,14 +88,6 @@ def SetCurrentID(user, newID):
 		ref = db.reference(f'/users/{user}/Tags/CurrentTagID')
 		ref.set(newID)
 # ----------
-	
-
-def CheckID(currentTagID):
-	return currentTagID in GetAllCurrentTagIDs()
-	
-	
-def NewUser():
-	pass
 	
 
 def AddEntry(user):
@@ -141,22 +133,9 @@ def CheckTimeslot(user):
 	ref = db.reference(f'/users/{user}/Access')
 	access = ref.get()
 	if access['AlwaysAccess'] or CheckTime(access['TimeSlots']):
-		#OpenDoor()
-		print('meowEnter')
-	else:
-		print('meowStayOut')
+		OpenDoor()
 
 
-def CheckEntry(currentTagID, tagID):
-	if not CheckID(currentTagID):
-		AddEntry()
-		if tagID not in GetAllTagIDs():
-			AddTagDB()
-		else:
-			Wiewoewiewoe()
-		return False
-	else:
-		CheckTimeslot()
 		
 		
 while True:

@@ -5,14 +5,18 @@ from mfrc522 import SimpleMFRC522
 from datetime import date, datetime
 from time import sleep
 import uuid
-from OpenDoor import OpenDoor
+from OpenDoor import *
 
 # ----------
-cred = credentials.Certificate("/home/admin/Guardian-Gate/rasp-test-8e035-firebase-adminsdk-ra7h9-924cbad2e3.json")
-firebase_admin.initialize_app(cred, {'databaseURL': 'https://rasp-test-8e035-default-rtdb.europe-west1.firebasedatabase.app/'})
+cred = credentials.Certificate("/home/admin/easelock/rasp-test-8e035-firebase-adminsdk-ra7h9-e116fc027b.json")  # Replace with the path to your service account JSON file
+firebase_admin.initialize_app(cred, {
+	"databaseURL": "https://rasp-test-8e035-default-rtdb.europe-west1.firebasedatabase.app",
+    'storageBucket': 'rasp-test-8e035.appspot.com'
+})
 reader = SimpleMFRC522()
 DAYS = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU']
 # ----------
+
 
 def GetTagsDB():
 	allTags = []
@@ -133,27 +137,35 @@ def CheckTimeslot(user):
 	ref = db.reference(f'/users/{user}/Access')
 	access = ref.get()
 	if access['AlwaysAccess'] or CheckTime(access['TimeSlots']):
-		OpenDoor()
+		print("access verleend")
+		opendoor()
 
 
-		
-"""		
+
+'''
 while True:
 	try:
 		id, currentID = reader.read()
 		if id is not None:
+			print("id wordt gechecked")
 			user = GetUserByID(id, currentID)
+			print(f"user:{user}")
 			tags = GetTags()
 			allCurrentTagIDs = GetAllCurrentTagIDs(tags)
 			allTagIDs = GetAllTagIDs(tags)
 			if currentID.strip() in allCurrentTagIDs and str(id).strip() in allTagIDs:
+				print("id recognised")
 				newID = str(uuid.uuid4())
 				reader.write(newID)
-				CheckTimeslot(GetUserByID(id, currentID))
 				SetCurrentID(user, newID)
+				CheckTimeslot(GetUserByID(id, newID))
+				
 			else:
+				print("id not recognized, adding new key")
 				AddNewKey(id, currentID)
+				sleep(3)
+			print("adding entry")
 			AddEntry(GetUsername(user) if user is not None else 'Unauthorized')
-			sleep(3)
-	except:
-		pass"""
+	except KeyboardInterrupt:
+		GPIO.cleanup()
+'''

@@ -1,6 +1,6 @@
 import firebase_admin
 from firebase_admin import credentials, db
-from OpenDoor import OpenDoor
+from OpenDoor import *
 # Start library
 #!/usr/bin/python
 
@@ -8,18 +8,22 @@ import RPi.GPIO as GPIO
 import time
 from threading import Timer
 from datetime import date, datetime
-
+'''
+cred = credentials.Certificate("/home/admin/easelock/rasp-test-8e035-firebase-adminsdk-ra7h9-e116fc027b.json")  # Replace with the path to your service account JSON file
+firebase_admin.initialize_app(cred, {
+	"databaseURL": "https://rasp-test-8e035-default-rtdb.europe-west1.firebasedatabase.app",
+    'storageBucket': 'rasp-test-8e035.appspot.com'
+})
+'''
 DEFAULT_KEY_DELAY = 300
 DEFAULT_REPEAT_DELAY = 1.0
 DEFAULT_REPEAT_RATE = 1.0
 DEFAULT_DEBOUNCE_TIME = 10
 
-cred = credentials.Certificate("/home/admin/Guardian-Gate/rasp-test-8e035-firebase-adminsdk-ra7h9-924cbad2e3.json")
-firebase_admin.initialize_app(cred, {'databaseURL': 'https://rasp-test-8e035-default-rtdb.europe-west1.firebasedatabase.app/'})
 
 entered = ""
 
-text_file = open('/home/admin/Guardian-Gate/MasterCode.txt')
+text_file = open('/home/admin/easelock/MasterCode.txt')
 MasterCode = text_file.read().strip()
 text_file.close()
 
@@ -28,7 +32,7 @@ text_file.close()
 
 class KeypadFactory():
 
-    def create_keypad(self, keypad=None, row_pins=None, col_pins=None, key_delay=DEFAULT_KEY_DELAY, repeat=False, repeat_delay=None, repeat_rate=None, gpio_mode=GPIO.BCM):
+    def create_keypad(self, keypad=None, row_pins=None, col_pins=None, key_delay=DEFAULT_KEY_DELAY, repeat=False, repeat_delay=None, repeat_rate=None, gpio_mode=GPIO.BOARD):
 
         if keypad is None:
             keypad = [
@@ -39,10 +43,10 @@ class KeypadFactory():
             ]
 
         if row_pins is None:
-            row_pins = [4,14,15,17]
+            row_pins = [7,8,10,11]
 
         if col_pins is None:
-            col_pins = [18,27,22]
+            col_pins = [12,13,15]
 
         return Keypad(keypad, row_pins, col_pins, key_delay, repeat, repeat_delay, repeat_rate, gpio_mode)
 
@@ -55,8 +59,8 @@ class KeypadFactory():
             ["*",0,"#"]
         ]
 
-        ROW_PINS = [4,14,15,17]
-        COL_PINS = [18,27,22]
+        ROW_PINS = [7,8,10,11]
+        COL_PINS = [12,13,15]
 
         return self.create_keypad(KEYPAD, ROW_PINS, COL_PINS)
 
@@ -69,8 +73,8 @@ class KeypadFactory():
             ["*",0,"#","D"]
         ]
 
-        ROW_PINS = [4,14,15,17]
-        COL_PINS = [18,27,22,23]
+        ROW_PINS = [7,8,10,11]
+        COL_PINS = [12,13,15]
 
         return self.create_keypad(KEYPAD, ROW_PINS, COL_PINS)
 
@@ -197,8 +201,8 @@ KEYPAD = [
     ["*", 0, "#"]
 ]
 
-COL_PINS = [12, 16, 20] # BCM numbering
-ROW_PINS = [6, 13, 19, 26] # BCM numbering
+COL_PINS = [32,36,38] # BCM numbering
+ROW_PINS = [31,33,35,37] # BCM numbering
 
 NEW_CHECKOLD = False
 NEW_ADDNEW = False
@@ -217,6 +221,7 @@ def check_key(key):
     global NEW_CHECKOLD
     global MasterCode
     key = str(key)
+    print(key)
     if key == "*":
         if not NEW_CHECKOLD and not NEW_ADDNEW:
             NEW_CHECKOLD = True
@@ -233,10 +238,10 @@ def check_key(key):
                 NEW_CHECKOLD = False
         elif NEW_ADDNEW:
             print(f"nieuwe code: {entered}")
-            text_file = open('/home/admin/Guardian-Gate/MasterCode.txt', "w")
+            text_file = open('/home/admin/easelock/MasterCode.txt', "w")
             text_file.write(entered)
             text_file.close()
-            text_file = open('/home/admin/Guardian-Gate/MasterCode.txt', "r")
+            text_file = open('/home/admin/easelock/MasterCode.txt', "r")
             MasterCode = text_file.read().strip()
             text_file.close()
             NEW_ADDNEW = False
@@ -247,7 +252,7 @@ def check_key(key):
         if not NEW_CHECKOLD and not NEW_ADDNEW:
             if entered == MasterCode:
                 AddEntry()
-                OpenDoor()
+                opendoor()
         else:
             NEW_ADDNEW = False
             NEW_CHECKOLD = False
@@ -255,7 +260,7 @@ def check_key(key):
     else:
         entered += key
 
-"""
+'''
 try:
     factory = KeypadFactory()
     keypad = factory.create_keypad(keypad=KEYPAD,row_pins=ROW_PINS, col_pins=COL_PINS) # makes assumptions about keypad layout and GPIO pin numbers
@@ -267,5 +272,6 @@ try:
 except KeyboardInterrupt:
 	pass
 finally:
+    keypad = factory.create_keypad(keypad=KEYPAD,row_pins=ROW_PINS, col_pins=COL_PINS) # makes assumptions about keypad layout and GPIO pin numbers
     keypad.cleanup()
-"""
+'''

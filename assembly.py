@@ -6,13 +6,12 @@ from firebase_admin import db
 import signal
 import sys
 import RPi.GPIO as GPIO
-import threading
+from multiprocessing import Process
 from picamera2 import Picamera2, Preview
 import time
-import EaseLock_Main as em
-import NumpadMain as nm
-
-
+from EaseLock_Main import *
+from NumpadMain import *
+ 
 
 #camera settings
 picam2 = Picamera2()
@@ -23,13 +22,6 @@ picam2.start()
 time.sleep(2)
 
 
-
-# Initialize the Firebase Admin SDK with your service account credentials
-cred = credentials.Certificate("/home/admin/easelock/rasp-test-8e035-firebase-adminsdk-ra7h9-f6fa22f310.json")  # Replace with the path to your service account JSON file
-firebase_admin.initialize_app(cred, {
-	"databaseURL": "https://rasp-test-8e035-default-rtdb.europe-west1.firebasedatabase.app",
-    'storageBucket': 'rasp-test-8e035.appspot.com'
-})
 
 
 # functies uit te voeren wanneer deurbel is gedrukt
@@ -49,9 +41,9 @@ def deurbel_pressed_callback():
     db.reference('/readtest').set("Er werd het laatst aangebeld op" + datetime.now().strftime("%d-%m-%Y, %H:%M:%S"))
 
 # Set the GPIO mode and pin number
-GPIO.setmode(GPIO.BCM)
-BUTTON_GPIO = 17  # You can use a different GPIO pin
-LOCK_GPIO = 14 
+GPIO.setmode(GPIO.BOARD)
+BUTTON_GPIO = 11  # You can use a different GPIO pin
+LOCK_GPIO = 8
 
 # Setup the button pin as an input with a pull-up resistor
 GPIO.setup(BUTTON_GPIO, GPIO.IN, pull_up_down=GPIO.PUD_UP)
@@ -74,15 +66,16 @@ def button_monitor():
         time.sleep(0.1)  # Optional debounce delay
 
 # slot openen (max 5 seconden) of slot sluiten
+# als state True is dan moet de slot sluiten anders openen
 def slot(state):
     print("slot functie gaat runnen met state: ", state)
-    if state:
+    if not state:
         print("slot gaat open")
         GPIO.output(LOCK_GPIO, GPIO.HIGH)
         time.sleep(5)
         print("slot gaat toe")
         GPIO.output(LOCK_GPIO, GPIO.LOW)
-    elif not state:
+    elif state:
         print(f"slot gaat toe: {state} (elif satement) ")
         GPIO.output(LOCK_GPIO, GPIO.LOW)
 
@@ -99,31 +92,39 @@ def readlock_monitor():
 
 def cardreader_monitor():
     while True:
+        print("reading card")
         try:
-            id, currentID = em.reader.read()
+            id, currentID = reader.read()
             if id is not None:
-                user = em.GetUserByID(id, currentID)
-                tags = em.GetTags()
-                allCurrentTagIDs = em.GetAllCurrentTagIDs(tags)
-                allTagIDs = em.GetAllTagIDs(tags)
+                print("id wordt gechecked")
+                user = GetUserByID(id, currentID)
+                print(f"user:{user}")
+                tags = GetTags()
+                allCurrentTagIDs = GetAllCurrentTagIDs(tags)
+                allTagIDs = GetAllTagIDs(tags)
                 if currentID.strip() in allCurrentTagIDs and str(id).strip() in allTagIDs:
-                    newID = str(em.uuid.uuid4())
-                    em.reader.write(newID)
-                    em.CheckTimeslot(em.GetUserByID(id, currentID))
-                    em.SetCurrentID(user, newID)
+                    print("id recognised")
+                    newID = str(uuid.uuid4())
+                    reader.write(newID)
+                    SetCurrentID(user, newID)
+                    CheckTimeslot(GetUserByID(id, newID))
+                    
                 else:
-                    em.AddNewKey(id, currentID)
-                em.AddEntry(em.GetUsername(user) if user is not None else 'Unauthorized')
-                em.sleep(3)
+                    print("id not recognized, adding new key")
+                    AddNewKey(id, currentID)
+                    sleep(3)
+                print("adding entry")
+                AddEntry(GetUsername(user) if user is not None else 'Unauthorized')
         except:
             pass
+        
 
 def numpad_reader_monitor():
     try:
-        factory = nm.KeypadFactory()
-        keypad = factory.create_keypad(keypad=nm.KEYPAD, row_pins=nm.ROW_PINS,
-                                       col_pins=nm.COL_PINS)  # makes assumptions about keypad layout and GPIO pin numbers
-        keypad.registerKeyPressHandler(nm.check_key)
+        factory = KeypadFactory()
+        keypad = factory.create_keypad(keypad=KEYPAD, row_pins=ROW_PINS,
+                                       col_pins=COL_PINS)  # makes assumptions about keypad layout and GPIO pin numbers
+        keypad.registerKeyPressHandler(check_key)
 
         while True:
             time.sleep(0.1)
@@ -133,28 +134,19 @@ def numpad_reader_monitor():
         keypad.cleanup()
 
 
-# Create a thread for button monitoring
-button_thread = threading.Thread(target=button_monitor)
-button_thread.daemon = True  # Allow the thread to exit when the main program ends
 
-readlock_thread = threading.Thread(target=readlock_monitor)
-readlock_thread.daemon = True  # Allow the thread to exit when the main program ends
+button_thread = Process(target=button_monitor)
+cardreader_thread = Process(target=cardreader_monitor)
+numpad_reader_thread = Process(target=numpad_reader_monitor)
 
-cardreader_thread = threading.Thread(target=cardreader_monitor)
-cardreader_thread.daemon = True
-
-numpad_reader_thread = threading.Thread(target=numpad_reader_monitor)
-readlock_thread.daemon = True
 
 try:
-    # Start the button monitoring thread
+    readlock_monitor()
+    
     button_thread.start()
-    # Start de lock change thread
-    readlock_thread.start()
-    # Your main program logic here
-    while True:
-        # Do something else in your program
-        pass
+    numpad_reader_thread.start()
+    cardreader_thread.start()
+    
 
 except KeyboardInterrupt:
     GPIO.cleanup()

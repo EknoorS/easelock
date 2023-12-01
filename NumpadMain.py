@@ -208,7 +208,7 @@ NEW_CHECKOLD = False
 NEW_ADDNEW = False
 
 
-def AddEntry():
+def AddNumpadEntry():
     now = datetime.now()
     key = now.strftime('%Y-%m-%d') + '_' + now.strftime('%H-%M-%S')
     ref = db.reference(f'/logs/{key}')
@@ -251,7 +251,7 @@ def check_key(key):
     elif key == "#":
         if not NEW_CHECKOLD and not NEW_ADDNEW:
             if entered == MasterCode:
-                AddEntry()
+                AddNumpadEntry()
                 opendoor()
         else:
             NEW_ADDNEW = False

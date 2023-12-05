@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </select>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="ebb1388d-a047-40b7-9829-89e7e3a69505" name="Default Changelist" comment="Pycharm commit and push" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="UPDATE_TYPE" value="REBASE" />
+  </component>
+  <component name="ProjectId" id="2XXFlVaKQOFGpWGp00kDaeLGexS" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../Gezichtsherkenning" />
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="ebb1388d-a047-40b7-9829-89e7e3a69505" name="Default Changelist" comment="" />
+      <created>1698767668245</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1698767668245</updated>
+    </task>
+    <task id="LOCAL-00001" summary="Aanmaak van deze file">
+      <created>1698771502260</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1698771502260</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Aanmaak van deze file">
+      <created>1699373332945</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1699373332945</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Add Thread to main loop">
+      <created>1700227225844</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1700227225844</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Pycharm commit and push">
+      <created>1701455891427</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1701455891427</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
+    <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Aanmaak van deze file" />
+    <MESSAGE value="Add Thread to main loop" />
+    <MESSAGE value="Pycharm commit and push" />
+    <option name="LAST_COMMIT_MESSAGE" value="Pycharm commit and push" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="408" y="226" key="#Updates" timestamp="1701455072469">
+      <screen x="0" y="0" width="1280" height="672" />
+    </state>
+    <state x="408" y="226" key="#Updates/0.0.1280.672@0.0.1280.672" timestamp="1701455072469" />
+    <state x="421" y="92" key="FileChooserDialogImpl" timestamp="1701456163797">
+      <screen x="0" y="0" width="1280" height="672" />
+    </state>
+    <state x="421" y="92" key="FileChooserDialogImpl/0.0.1280.672@0.0.1280.672" timestamp="1701456163797" />
+    <state x="530" y="205" width="681" height="263" key="MultipleFileMergeDialog" timestamp="1701455883369">
+      <screen x="0" y="0" width="1280" height="672" />
+    </state>
+    <state x="530" y="205" width="681" height="263" key="MultipleFileMergeDialog/0.0.1280.672@0.0.1280.672" timestamp="1701455883369" />
+    <state x="233" y="57" key="Vcs.Push.Dialog.v2" timestamp="1700227230186">
+      <screen x="0" y="0" width="1280" height="672" />
+    </state>
+    <state x="233" y="57" key="Vcs.Push.Dialog.v2/0.0.1280.672@0.0.1280.672" timestamp="1700227230186" />
+    <state x="450" y="251" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1699373320348">
+      <screen x="0" y="0" width="1280" height="672" />
+    </state>
+    <state x="450" y="251" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1280.672@0.0.1280.672" timestamp="1699373320348" />
+    <state x="303" y="-1" width="672" height="678" key="search.everywhere.popup" timestamp="1699980077863">
+      <screen x="0" y="0" width="1280" height="672" />
+    </state>
+    <state x="303" y="-1" width="672" height="678" key="search.everywhere.popup/0.0.1280.672@0.0.1280.672" timestamp="1699980077863" />
+  </component>
+</project>
